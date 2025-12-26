@@ -13,7 +13,11 @@ import {
   X, 
   Share2, 
   Layers, 
-  Zap 
+  Zap,
+  Calendar,
+  Clock,
+  MapPin,
+  User
 } from 'lucide-react';
 import { Content } from './constants';
 import { Lang, Nav } from './types';
@@ -27,7 +31,7 @@ const IconMap = {
 };
 
 const App: React.FC = () => {
-  const [lang, setLang] = useState<Lang>('zh');
+  const [lang, setLang] = useState<Lang>('en');
   const [darkMode, setDarkMode] = useState<boolean>(true);
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
   
@@ -49,24 +53,50 @@ const App: React.FC = () => {
     return IconMap[iconName];
   };
 
+  const scrollToSection = (e: React.MouseEvent<HTMLAnchorElement>, sectionId: string) => {
+    e.preventDefault();
+    setIsMenuOpen(false);
+    const element = document.getElementById(sectionId);
+    if (element) {
+      // Offset for fixed header (h-16 = 64px)
+      const headerOffset = 64;
+      const elementPosition = element.getBoundingClientRect().top;
+      const offsetPosition = elementPosition + window.scrollY - headerOffset;
+
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: "smooth"
+      });
+    }
+  };
+
   return (
     <div className={`min-h-screen transition-colors duration-300 font-sans ${darkMode ? 'bg-[#0a0f1c] text-slate-200' : 'bg-slate-50 text-slate-800'}`}>
       
       {/* Navigation */}
-      <nav className={`fixed w-full z-50 backdrop-blur-md border-b transition-colors duration-300 ${darkMode ? 'bg-[#0a0f1c]/80 border-cyan-900/30' : 'bg-white/80 border-slate-200'}`}>
+      <nav className={`fixed top-0 left-0 right-0 z-50 backdrop-blur-md border-b transition-colors duration-300 ${darkMode ? 'bg-[#0a0f1c]/80 border-cyan-900/30' : 'bg-white/80 border-slate-200'}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 cursor-pointer" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
               <Terminal className={`h-8 w-8 ${darkMode ? 'text-cyan-400' : 'text-cyan-600'}`} />
               <span className={`font-mono font-bold text-xl tracking-tighter ${darkMode ? 'text-white' : 'text-slate-900'}`}>
-                TWIN3<span className="text-cyan-500">_PROTOCOL</span>
+                twin3<span className="text-cyan-500">_protocol</span>
               </span>
             </div>
             
             <div className="hidden md:block">
               <div className="ml-10 flex items-baseline space-x-8 text-sm font-medium">
                 {(Object.keys(t.nav) as Array<keyof Nav>).map((key) => (
-                   key !== 'register' && <a key={key} href={`#${key}`} className="hover:text-cyan-500 transition-colors cursor-pointer uppercase tracking-wide opacity-80 hover:opacity-100">{t.nav[key]}</a>
+                   key !== 'register' && (
+                     <a 
+                       key={key} 
+                       href={`#${key}`} 
+                       onClick={(e) => scrollToSection(e, key)}
+                       className="hover:text-cyan-500 transition-colors cursor-pointer uppercase tracking-wide opacity-80 hover:opacity-100"
+                     >
+                       {t.nav[key]}
+                     </a>
+                   )
                 ))}
               </div>
             </div>
@@ -78,9 +108,14 @@ const App: React.FC = () => {
               <button onClick={toggleTheme} className={`p-2 rounded-full transition-colors ${darkMode ? 'hover:bg-white/10 text-yellow-400' : 'hover:bg-slate-200 text-slate-600'}`}>
                 {darkMode ? <Sun size={20} /> : <Moon size={20} />}
               </button>
-              <button className="bg-cyan-600 hover:bg-cyan-500 text-white px-5 py-2 rounded-sm font-mono text-sm font-bold tracking-wide transition-all shadow-[0_0_15px_rgba(8,145,178,0.5)]">
+              <a 
+                href="https://lu.ma/twin3-genesis-2026"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-cyan-600 hover:bg-cyan-500 text-white px-5 py-2 rounded-sm font-mono text-sm font-bold tracking-wide transition-all shadow-[0_0_15px_rgba(8,145,178,0.5)] cursor-pointer"
+              >
                 {t.nav.register}
-              </button>
+              </a>
             </div>
 
             <div className="md:hidden flex items-center gap-2">
@@ -99,10 +134,30 @@ const App: React.FC = () => {
           <div className={`md:hidden absolute w-full border-b shadow-xl ${darkMode ? 'bg-[#0a0f1c] border-cyan-900/30' : 'bg-white border-slate-200'}`}>
             <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
               {(Object.keys(t.nav) as Array<keyof Nav>).map((key) => (
-                <a key={key} href={`#${key}`} onClick={() => setIsMenuOpen(false)} className="block px-3 py-2 text-base font-medium hover:text-cyan-500 transition-colors">{t.nav[key]}</a>
+                key !== 'register' && (
+                  <a 
+                    key={key} 
+                    href={`#${key}`} 
+                    onClick={(e) => scrollToSection(e, key)} 
+                    className="block px-3 py-2 text-base font-medium hover:text-cyan-500 transition-colors"
+                  >
+                    {t.nav[key]}
+                  </a>
+                )
               ))}
               <div className="flex items-center justify-between px-3 py-4 border-t border-gray-700/50 mt-4">
                  <button onClick={toggleLang} className="flex items-center gap-2 font-bold"><Globe size={16} /> {lang === 'zh' ? 'Switch to English' : '切換至中文'}</button>
+              </div>
+              <div className="px-3 pb-2">
+                <a 
+                  href="https://lu.ma/twin3-genesis-2026"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => setIsMenuOpen(false)}
+                  className="block text-center bg-cyan-600 hover:bg-cyan-500 text-white px-5 py-2 rounded-sm font-mono text-sm font-bold tracking-wide transition-all"
+                >
+                  {t.nav.register}
+                </a>
               </div>
             </div>
           </div>
@@ -137,12 +192,22 @@ const App: React.FC = () => {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button className="px-8 py-4 bg-cyan-600 hover:bg-cyan-500 text-white rounded font-bold text-lg transition-all shadow-[0_0_20px_rgba(8,145,178,0.6)] hover:shadow-[0_0_30px_rgba(8,145,178,0.8)] flex items-center justify-center gap-2 group">
+            <a 
+              href="https://lu.ma/twin3-genesis-2026" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="px-8 py-4 bg-cyan-600 hover:bg-cyan-500 text-white rounded font-bold text-lg transition-all shadow-[0_0_20px_rgba(8,145,178,0.6)] hover:shadow-[0_0_30px_rgba(8,145,178,0.8)] flex items-center justify-center gap-2 group cursor-pointer"
+            >
               {t.hero.cta} <ChevronRight className="group-hover:translate-x-1 transition-transform" />
-            </button>
-            <button className={`px-8 py-4 rounded font-bold text-lg border transition-all flex items-center justify-center gap-2 ${darkMode ? 'border-slate-700 hover:border-slate-500 hover:bg-slate-800' : 'border-slate-300 hover:bg-slate-100'}`}>
+            </a>
+            <a 
+               href="https://docs.twin3.dev"
+               target="_blank"
+               rel="noopener noreferrer"
+               className={`px-8 py-4 rounded font-bold text-lg border transition-all flex items-center justify-center gap-2 cursor-pointer ${darkMode ? 'border-slate-700 hover:border-slate-500 hover:bg-slate-800' : 'border-slate-300 hover:bg-slate-100'}`}
+            >
               <Code size={20} /> {t.hero.secondary}
-            </button>
+            </a>
           </div>
         </div>
       </section>
@@ -214,6 +279,9 @@ const App: React.FC = () => {
                     <Icon className={`h-10 w-10 mb-4 ${darkMode ? 'text-cyan-400' : 'text-cyan-600'}`} />
                     <h4 className="text-xl font-bold mb-2">{track.name}</h4>
                     <span className={`block text-sm font-mono mb-4 ${darkMode ? 'text-slate-500' : 'text-slate-400'}`}>{track.goal}</span>
+                    <span className={`inline-block text-sm font-bold px-2 py-1 rounded ${darkMode ? 'bg-green-900/30 text-green-400 border border-green-800' : 'bg-green-100 text-green-700 border border-green-200'}`}>
+                      {track.prize}
+                    </span>
                   </div>
                   <p className={`text-sm leading-relaxed ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
                     {track.desc}
@@ -226,6 +294,51 @@ const App: React.FC = () => {
                 </div>
               );
             })}
+          </div>
+        </div>
+      </section>
+
+      {/* Bootcamp Section */}
+      <section id="bootcamp" className={`py-20 relative ${darkMode ? 'bg-[#0b101e]' : 'bg-slate-50'}`}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className={`text-sm font-mono font-bold tracking-widest uppercase mb-2 ${darkMode ? 'text-cyan-500' : 'text-cyan-600'}`}>{t.bootcamp.subtitle}</h2>
+            <h3 className="text-3xl md:text-4xl font-bold mb-6">{t.bootcamp.title}</h3>
+            <div className={`inline-flex items-center gap-6 text-sm font-medium ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+               <span className="flex items-center gap-2"><Calendar size={16} className={darkMode ? 'text-cyan-400' : 'text-cyan-600'} /> {t.bootcamp.date}</span>
+               <span className="flex items-center gap-2"><MapPin size={16} className={darkMode ? 'text-cyan-400' : 'text-cyan-600'} /> {t.bootcamp.location}</span>
+            </div>
+          </div>
+
+          <div className="grid lg:grid-cols-2 gap-8">
+            {t.bootcamp.sessions.map((session, idx) => (
+              <div key={idx} className={`p-8 rounded-xl border ${darkMode ? 'bg-[#0a0f1c] border-slate-800' : 'bg-white border-slate-200'}`}>
+                 <div className="mb-8">
+                   <div className={`inline-block px-3 py-1 rounded-full text-xs font-bold mb-3 ${darkMode ? 'bg-cyan-950 text-cyan-400' : 'bg-cyan-100 text-cyan-700'}`}>
+                     {session.label}
+                   </div>
+                   <h4 className="text-xl font-bold">{session.title}</h4>
+                 </div>
+
+                 <div className="space-y-8 relative before:absolute before:left-[7px] before:top-2 before:h-[calc(100%-16px)] before:w-[2px] before:bg-slate-200 dark:before:bg-slate-800">
+                   {session.items.map((item, itemIdx) => (
+                     <div key={itemIdx} className="relative pl-8">
+                       <span className={`absolute left-0 top-[6px] h-4 w-4 rounded-full border-2 ${darkMode ? 'bg-[#0a0f1c] border-cyan-500' : 'bg-white border-cyan-600'}`}></span>
+                       <div className="mb-1 flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4">
+                         <span className={`font-mono text-sm font-bold ${darkMode ? 'text-cyan-400' : 'text-cyan-600'}`}>{item.time}</span>
+                         <span className="font-bold text-lg">{item.title}</span>
+                       </div>
+                       {item.speaker && (
+                         <div className={`flex items-center gap-2 text-sm mb-2 italic ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
+                           <User size={14} /> {item.speaker}
+                         </div>
+                       )}
+                       <p className={`text-sm leading-relaxed ${darkMode ? 'text-slate-500' : 'text-slate-600'}`}>{item.desc}</p>
+                     </div>
+                   ))}
+                 </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>

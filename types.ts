@@ -3,6 +3,7 @@ export interface Nav {
   about: string;
   mechanism: string;
   tracks: string;
+  bootcamp: string;
   specs: string;
   criteria: string;
   register: string;
@@ -44,12 +45,34 @@ export interface Track {
   goal: string;
   desc: string;
   icon: 'Database' | 'Cpu' | 'Shield';
+  prize: string;
 }
 
 export interface Tracks {
   title: string;
   subtitle: string;
   list: Track[];
+}
+
+export interface AgendaItem {
+  time: string;
+  title: string;
+  speaker: string;
+  desc: string;
+}
+
+export interface AgendaSession {
+  label: string;
+  title: string;
+  items: AgendaItem[];
+}
+
+export interface Bootcamp {
+  title: string;
+  subtitle: string;
+  date: string;
+  location: string;
+  sessions: AgendaSession[];
 }
 
 export interface Tech {
@@ -84,6 +107,7 @@ export interface Translation {
   overview: Overview;
   mechanism: Mechanism;
   tracks: Tracks;
+  bootcamp: Bootcamp;
   tech: Tech;
   criteria: Criteria;
   footer: Footer;
